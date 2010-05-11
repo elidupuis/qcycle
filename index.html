@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>jQuery qCycle</title>
+	<style type="text/css" media="screen">
+		/* None of this CSS is required to use the plugin. It is simply for the demo. */
+		#slideshow a			{ color: #fff; text-decoration: none; }
+		#slideshow a:hover		{ color: #ccc; }
+		.details	{ background: rgba(0,0,0,0.7); color: #fff; padding: 1em; position: absolute; bottom: 0; left: 0; }
+		.details a	{ font-weight: bold; }
+		#pagers a	{ background: #ccc; color: #666; font: 11px/1.2 Helvetica, sans-serif; padding: 2px 4px; margin-right: 3px; text-decoration: none;	}
+		#pagers a.activeSlide	{ background-color: #666; color: #fff; }
+		img			{ vertical-align: bottom; }
+	</style>
+	<!-- STEP 1 -->
+	<!-- Include jQuery, jquery.cycle, and jquery.qCycle -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.latest.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery.qCycle.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+	
+	//	STEP 2
+	//	define an array that contains whatever information you require. i'm making the assumption you this is going to be used for photos so i'll say the image path is required.
+	//	you can define the information however you want to because you will be providing a function that will access this informaiton later.
+		
+		var images = [
+						{
+							title:'image two',
+							img:'img/image-2.jpg',
+							href:'http://www.malsup.com/jquery/cycle/',
+							blurb:'Appropriately communicate holistic quality vectors through bricks-and-clicks data. Enthusiastically leverage other\'s world-class collaboration and idea-sharing for diverse processes.'
+						},
+						{
+							title:'image three',
+							img:'img/image-3.jpg',
+							href:'http://jquery.com',
+							blurb:'Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.'
+						},
+						{
+							title:'image four',
+							img:'img/image-4.jpg',
+							href:'http://google.ca',
+							blurb:'Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.'
+						},
+						{
+							title:'image five',
+							img:'img/image-5.jpg',
+							href:'http://elidupuis.com',
+							blurb:'Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.'
+						}
+					];
+
+		
+		$(document).ready(function(){
+			
+	//	STEP 3
+	//	inside DOM ready call plugin
+			
+			$('#slideshow').qCycle({
+				//	view http://wiki.github.com/elidupuis/qCycle/ for available options and how to use them
+				//	array of images/data being passed in  
+				toLoad: images,
+				
+				//	options for the jquery.cycle plugin (http://www.malsup.com/jquery/cycle/options.html)
+				cycleOpts: 	{
+								fx: 'fade',
+								timeout: 3*1000,
+								pager: '#pagers'
+							},
+
+				//	custom function to create each slide exactly how you want it.
+				createSlide: function (img) {
+					//	data stored in img.data('qCycle.slideData')
+					var data = img.data('qCycle.slideData');
+
+					//	this will be custom depending on your setup. do whatever you need here.
+					var slide = $('<div>').addClass('slide').append($(img).attr('alt',data.title));
+					slide.append(
+						$('<div class="details">').append($('<p></p>').html( "<strong>" + data.title + "</strong> " + data.blurb )).append(
+								$('<a class="more-info"></a>').text('Find out more >').attr('href',data.href)
+						));
+					
+					//	be sure to return a properly contained HTML element that fits into your cycle/slideshow
+					return slide;
+				}
+			});
+
+		});
+		
+		if(window.console) window.console.info($.fn.qCycle.ver());
+	</script>
+</head>
+
+<body>
+	<h1>jQuery.qCycle Demo</h1>
+
+	<!-- STEP 4 -->
+	<!-- initial setup. Define your first slide. This is not only the first slide in your slideshow, but also acts as the default content in case javascript is turned off (or there was a problem loading data).  -->
+	<div id="slideshow">
+		<div class="slide">
+			<img src="img/image-1.jpg" alt="" />
+			<div class="details">
+				<p><strong>image one</strong> Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.</p>
+				<a class="more-info" href="http://github.com/elidupuis/qCycle/">Find out more ></a>
+			</div>
+		</div>
+	</div>
+	<div id="pagers"></div>
+	
+	<p>Get more info, including the source, at <a href="http://github.com/elidupuis/qCycle/">http://github.com/elidupuis/qCycle/</a>.</p>
+	
+</body>
+</html>
