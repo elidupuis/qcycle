@@ -1,0 +1,3 @@
+qCycle can be used to queue load a set of images for use in a banner or slideshow. It helps keep your markup clean by only requiring you to have one image in your source—this image is your default image.
+
+qCycle is a wrapper for the jquery.cycle plugin. jquery.cycle IS REQUIRED. Get it here: http://www.malsup.com/jquery/cycle/
