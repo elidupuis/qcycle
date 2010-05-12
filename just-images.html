@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>jQuery qCycle</title>
+	<style type="text/css" media="screen">
+		/* None of this CSS is required to use the plugin. It is simply for the demo. */
+		#pagers a	{ background: #ccc; color: #666; font: 11px/1.2 Helvetica, sans-serif; padding: 2px 4px; margin-right: 3px; text-decoration: none;	}
+		#pagers a.activeSlide	{ background-color: #666; color: #fff; }
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.latest.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery.qCycle.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+		var images = [ 
+						'http://farm4.static.flickr.com/3337/4597107633_49dc2253ef_o.jpg',
+						'http://farm4.static.flickr.com/3358/4597108157_a90ee422a0_o.jpg',
+						'http://farm2.static.flickr.com/1421/4597107235_50f51d464a_o.jpg',
+						'http://farm5.static.flickr.com/4067/4597722526_6e87fd62bc_o.jpg'
+					];
+
+		$(document).ready(function(){
+			$('#slideshow').qCycle({
+				toLoad: images,
+				cycleOpts: 	{
+								fx: 'fade',
+								timeout: 3*1000,
+								pager: '#pagers'
+				},
+				pageLoad: false
+			});
+
+		});
+		
+		if(window.console) window.console.info($.fn.qCycle.ver());
+	</script>
+</head>
+
+<body>
+	<h1>jQuery.qCycle demo -- just images</h1>
+
+	<div id="slideshow">
+		<img src="http://farm2.static.flickr.com/1243/4597723386_5115429a6e_o.jpg" alt="" />
+	</div>
+	<div id="pagers"></div>
+	
+	<p>Get more info, including the source, at <a href="http://github.com/elidupuis/qCycle/">http://github.com/elidupuis/qCycle/</a>.</p>
+	
+</body>
+</html>
