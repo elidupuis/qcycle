@@ -1,6 +1,6 @@
 /**
  *	jQuery qCycle plugin
- *	@version 0.4
+ *	@version 0.5
  *	@date April 11, 2010
  *	@author Eli Dupuis
  *	@license Creative Commons Share Alike 2.5 Canada (http://creativecommons.org/licenses/by-sa/2.5/ca/)
@@ -9,6 +9,8 @@
  *				uses jquery.cycle.addSlide() function which is not supported in jquery.cycleLite (http://www.malsup.com/jquery/cycle/lite/)
  *
  *	CHANGLOG:
+ *	v0.5
+	-updated all internal functions to be within the $.fn.qCycle namespace
  *	v0.4
 	-added ability to pass in an array of images only, as opposed to an array of objects containing image paths as well as other data. 
 	-updated start property to be a boolean called onPageLoad. by default the plugin waits for $(window).load. set to false to run immediately
@@ -17,11 +19,12 @@
  *
  *  TODO: support JSON import for data...
  *	TODO: optimize!
+ *	TODO: can internal functions be private?
 */
 
 (function($) {
 
-var ver = '0.4';
+var ver = '0.5';
 
 $.fn.qCycle = function(options) {
 
@@ -36,16 +39,16 @@ $.fn.qCycle = function(options) {
 
 		if (opts.onPageLoad) {
 			$(window).load(function(){
-				initSlideshow($this);
+				$.fn.qCycle.initSlideshow($this);
 			});
 		}else{
-			initSlideshow($this);			
+			$.fn.qCycle.initSlideshow($this);			
 		};
 
 	});
 };
 
-function initSlideshow(obj){
+$.fn.qCycle.initSlideshow = function (obj) {
 	var o = obj.data('qCycle.opts');
 	obj.data( 'qCycle.slidesLoaded', 0 );
 	
@@ -53,7 +56,7 @@ function initSlideshow(obj){
 	
 	if (o.toLoad != null) {
 		var theImage = $('<img/>').load(function(){ 
-			addSlide($(this),obj,true);
+			$.fn.qCycle.addSlide($(this),obj,true);
 		}).data(
 			'qCycle.slideData',o.toLoad[loaded]
 		);
@@ -69,7 +72,7 @@ function initSlideshow(obj){
 	
 };
 
-function startSlideshow(obj){
+$.fn.qCycle.startSlideshow = function (obj) {
 	var o = obj.data('qCycle.opts');
 	var loaded = obj.data( 'qCycle.slidesLoaded' );
 
@@ -77,15 +80,15 @@ function startSlideshow(obj){
 	var slideshow = obj.cycle(o.cycleOpts);		//	start cycle
 	obj.data('qCycle.cycleOpts', $(slideshow).data('cycle.opts'));	//	grab reference to cycle so we can use cycle.addSlide() later
 
-	if (loaded < obj.data('qCycle.opts').toLoad.length) loadSlide(obj);
+	if (loaded < obj.data('qCycle.opts').toLoad.length) $.fn.qCycle.loadSlide(obj);
 	obj.data( 'qCycle.slidesLoaded', obj.data( 'qCycle.slidesLoaded' )+1 );		//	increment loaded counter
 };
 
-function loadSlide(obj){
+$.fn.qCycle.loadSlide = function (obj) {
 	var loaded = obj.data( 'qCycle.slidesLoaded' );
 	
 	var theImage = $('<img/>').load(function(){ 
-			addSlide($(this),obj);
+			$.fn.qCycle.addSlide($(this),obj);
 		}).data(
 			'qCycle.slideData',obj.data('qCycle.opts').toLoad[loaded]
 		);
@@ -98,8 +101,7 @@ function loadSlide(obj){
 	
 };
 
-function addSlide(img,obj,init){
-	if(window.console) window.console.log(img,obj,init);
+$.fn.qCycle.addSlide = function (img,obj,init) {
 	
 	var cycleOpts = obj.data('qCycle.cycleOpts');
 
@@ -109,7 +111,7 @@ function addSlide(img,obj,init){
 	if (init == true) {
 		//	first pass. use standard jquery.append because cycle is not initialized yet.
 		obj.append(slide);
-		startSlideshow(obj);
+		$.fn.qCycle.startSlideshow(obj);
 	}else{
 		//	not first pass. add slide via cycle.addSlide() function:
 		cycleOpts.addSlide(slide);
@@ -117,7 +119,7 @@ function addSlide(img,obj,init){
 	
 	//	update counters and initiate loading of next image (if there's more tho load!):
 	var loaded = obj.data( 'qCycle.slidesLoaded' );
-	if (loaded < obj.data('qCycle.opts').toLoad.length ) loadSlide(obj);
+	if (loaded < obj.data('qCycle.opts').toLoad.length ) $.fn.qCycle.loadSlide(obj);
 	obj.data( 'qCycle.slidesLoaded', obj.data( 'qCycle.slidesLoaded' )+1 );
 	
 };
