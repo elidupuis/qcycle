@@ -1,7 +1,7 @@
 /**
  *	jQuery qCycle plugin
- *	@version 0.5
- *	@date April 11, 2010
+ *	@version 0.6
+ *	@date April 12, 2010
  *	@author Eli Dupuis
  *	@license Creative Commons Share Alike 2.5 Canada (http://creativecommons.org/licenses/by-sa/2.5/ca/)
  *	Requires: jQuery v1.3.2 or later (most likely works fine with earlier versions, but untested)
@@ -9,6 +9,10 @@
  *				uses jquery.cycle.addSlide() function which is not supported in jquery.cycleLite (http://www.malsup.com/jquery/cycle/lite/)
  *
  *	CHANGLOG:
+ *	v0.6
+	-reverted namespacing of internal functions
+	-added imageKey option. user can now customize the image path property in toLoad array.
+	-added ability to pass in a url for the toLoad option. URL should return a JSON array. this still needs some clean up...
  *	v0.5
 	-updated all internal functions to be within the $.fn.qCycle namespace
  *	v0.4
@@ -19,12 +23,11 @@
  *
  *  TODO: support JSON import for data...
  *	TODO: optimize!
- *	TODO: can internal functions be private?
 */
 
 (function($) {
 
-var ver = '0.5';
+var ver = '0.6';
 
 $.fn.qCycle = function(options) {
 
@@ -39,16 +42,16 @@ $.fn.qCycle = function(options) {
 
 		if (opts.onPageLoad) {
 			$(window).load(function(){
-				$.fn.qCycle.initSlideshow($this);
+				initSlideshow($this);
 			});
 		}else{
-			$.fn.qCycle.initSlideshow($this);			
+			initSlideshow($this);			
 		};
 
 	});
 };
 
-$.fn.qCycle.initSlideshow = function (obj) {
+function initSlideshow (obj) {
 	var o = obj.data('qCycle.opts');
 	obj.data( 'qCycle.slidesLoaded', 0 );
 	
@@ -56,23 +59,38 @@ $.fn.qCycle.initSlideshow = function (obj) {
 	
 	if (o.toLoad != null) {
 		var theImage = $('<img/>').load(function(){ 
-			$.fn.qCycle.addSlide($(this),obj,true);
-		}).data(
-			'qCycle.slideData',o.toLoad[loaded]
-		);
+			addSlide($(this),obj,true);
+		});
 		
-		if (o.toLoad[loaded].img) {
-			theImage.attr( 'src', o.toLoad[loaded].img );
+		//	check for JSON
+		if (typeof(o.toLoad) === 'string') {
+			$.getJSON(o.toLoad, function(json){
+				o.toLoad = json;
+				setImageSource(theImage, o, loaded);
+			});
 		}else{
-			theImage.attr( 'src', o.toLoad[loaded] );
+			setImageSource(theImage, o, loaded);
 		};
+		
 	}
 	
 	obj.data( 'qCycle.slidesLoaded', obj.data( 'qCycle.slidesLoaded' )+1 );
 	
 };
 
-$.fn.qCycle.startSlideshow = function (obj) {
+function setImageSource(theImage, o, loaded){
+	//	this has to be here because of first slide loaded dynamically.
+	//	was having issues in initSlideshow with o.toLoad being the requested json url string, as opposed to actual data...
+	theImage.data('qCycle.slideData',o.toLoad[loaded]);
+	
+	if (o.toLoad[loaded][o.imageKey]) {
+		theImage.attr( 'src', o.toLoad[loaded][o.imageKey] );
+	}else{
+		theImage.attr( 'src', o.toLoad[loaded] );
+	};
+}
+
+function startSlideshow (obj) {
 	var o = obj.data('qCycle.opts');
 	var loaded = obj.data( 'qCycle.slidesLoaded' );
 
@@ -80,28 +98,30 @@ $.fn.qCycle.startSlideshow = function (obj) {
 	var slideshow = obj.cycle(o.cycleOpts);		//	start cycle
 	obj.data('qCycle.cycleOpts', $(slideshow).data('cycle.opts'));	//	grab reference to cycle so we can use cycle.addSlide() later
 
-	if (loaded < obj.data('qCycle.opts').toLoad.length) $.fn.qCycle.loadSlide(obj);
+	if (loaded < obj.data('qCycle.opts').toLoad.length) loadSlide(obj);
 	obj.data( 'qCycle.slidesLoaded', obj.data( 'qCycle.slidesLoaded' )+1 );		//	increment loaded counter
 };
 
-$.fn.qCycle.loadSlide = function (obj) {
+function loadSlide (obj) {
+	var o = obj.data('qCycle.opts');
 	var loaded = obj.data( 'qCycle.slidesLoaded' );
 	
 	var theImage = $('<img/>').load(function(){ 
-			$.fn.qCycle.addSlide($(this),obj);
+			addSlide($(this),obj);
 		}).data(
 			'qCycle.slideData',obj.data('qCycle.opts').toLoad[loaded]
 		);
-		
-	if (obj.data('qCycle.opts').toLoad[loaded].img) {
-		theImage.attr( 'src', obj.data('qCycle.opts').toLoad[loaded].img );
-	}else{
-		theImage.attr( 'src', obj.data('qCycle.opts').toLoad[loaded] );
-	};
+	
+	setImageSource(theImage, o, loaded);
+	// if (obj.data('qCycle.opts').toLoad[loaded][o.imageKey]) {
+	// 		theImage.attr( 'src', obj.data('qCycle.opts').toLoad[loaded][o.imageKey] );
+	// 	}else{
+	// 		theImage.attr( 'src', obj.data('qCycle.opts').toLoad[loaded] );
+	// 	};
 	
 };
 
-$.fn.qCycle.addSlide = function (img,obj,init) {
+function addSlide (img,obj,init) {
 	
 	var cycleOpts = obj.data('qCycle.cycleOpts');
 
@@ -111,7 +131,7 @@ $.fn.qCycle.addSlide = function (img,obj,init) {
 	if (init == true) {
 		//	first pass. use standard jquery.append because cycle is not initialized yet.
 		obj.append(slide);
-		$.fn.qCycle.startSlideshow(obj);
+		startSlideshow(obj);
 	}else{
 		//	not first pass. add slide via cycle.addSlide() function:
 		cycleOpts.addSlide(slide);
@@ -119,7 +139,7 @@ $.fn.qCycle.addSlide = function (img,obj,init) {
 	
 	//	update counters and initiate loading of next image (if there's more tho load!):
 	var loaded = obj.data( 'qCycle.slidesLoaded' );
-	if (loaded < obj.data('qCycle.opts').toLoad.length ) $.fn.qCycle.loadSlide(obj);
+	if (loaded < obj.data('qCycle.opts').toLoad.length ) loadSlide(obj);
 	obj.data( 'qCycle.slidesLoaded', obj.data( 'qCycle.slidesLoaded' )+1 );
 	
 };
@@ -132,7 +152,8 @@ $.fn.qCycle.defaults = {
 	toLoad: null,
 	cycleOpts:{},
 	createSlide: function(img){	return img;	},
-	onPageLoad: true
+	onPageLoad: true,
+	imageKey: 'img'
 };
 
 //	public function/method
