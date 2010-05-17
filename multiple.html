@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>jQuery qCycle</title>
+	<style type="text/css" media="screen">
+		/* None of this CSS is required to use the plugin. It is simply for the demo. */
+		.slideshow a			{ color: #fff; text-decoration: none; }
+		.slideshow a:hover		{ color: #ccc; }
+		.slide		{ position: relative; }
+		.details	{ background: rgba(0,0,0,0.7); color: #fff; padding: 1em; position: absolute; bottom: 0; left: 0; }
+		.details a	{ font-weight: bold; }
+		#pagers a	{ background: #ccc; color: #666; font: 11px/1.2 Helvetica, sans-serif; padding: 2px 4px; margin-right: 3px; text-decoration: none;	}
+		#pagers a.activeSlide	{ background-color: #666; color: #fff; }
+		img			{ vertical-align: bottom; }
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.latest.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery.qCycle.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+		var images = [
+						{
+							title:'image two',
+							imag:'http://farm4.static.flickr.com/3337/4597107633_49dc2253ef_o.jpg',
+							href:'http://www.malsup.com/jquery/cycle/',
+							blurb:'Appropriately communicate holistic quality vectors through bricks-and-clicks data. Enthusiastically leverage other\'s world-class collaboration and idea-sharing for diverse processes.'
+						},
+						{
+							title:'image three',
+							imag:'http://farm4.static.flickr.com/3358/4597108157_a90ee422a0_o.jpg',
+							href:'http://jquery.com',
+							blurb:'Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.'
+						}
+					];
+					
+		var images2 = [
+						{
+							title:'image four',
+							img:'http://farm2.static.flickr.com/1421/4597107235_50f51d464a_o.jpg',
+							href:'http://google.ca',
+							blurb:'Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.'
+						},
+						{
+							title:'image five',
+							img:'http://farm5.static.flickr.com/4067/4597722526_6e87fd62bc_o.jpg',
+							href:'http://elidupuis.com',
+							blurb:'Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.'
+						}
+					];
+
+		
+		$(document).ready(function(){
+			$('#slideshow').qCycle({
+				toLoad: images,
+				cycleOpts: 	{
+								fx: 'fade',
+								timeout: 2*1000,
+								pager: '#pagers'
+				},
+				createSlide: function (img) {
+					var data = img.data('qCycle.slideData');
+					var slide = $('<div>').addClass('slide').append($(img).attr('alt',data.title));
+					slide.append(
+						$('<div class="details">').append($('<p></p>').html( "<strong>" + data.title + "</strong> " + data.blurb )).append(
+								$('<a class="more-info"></a>').text('Find out more >').attr('href',data.href)
+						));
+					return slide;
+				},
+				imageKey: 'imag'
+			});
+			
+			
+			$('#slideshow2').qCycle({
+				toLoad: images2,
+				cycleOpts: {
+					fx: 'scrollHorz'
+				},
+				createSlide: function (img) {
+					var data = img.data('qCycle.slideData');
+					var slide = $('<div>').addClass('slide').append($(img).attr('alt',data.title));
+					slide.append(
+						$('<div class="details">').append($('<p></p>').html( "<strong>" + data.title + "</strong> " + data.blurb )).append(
+								$('<a class="more-info"></a>').text('Find out more >').attr('href',data.href)
+						));
+					return slide;
+				},
+				onPageLoad: false
+			});
+
+		});
+		
+		// if(window.console) window.console.info($.fn.qCycle.ver());
+	</script>
+</head>
+
+<body>
+	<h1>jQuery.qCycle Demo</h1>
+
+	<div id="slideshow" class="slideshow">
+		<div class="slide">
+			<img src="http://farm2.static.flickr.com/1243/4597723386_5115429a6e_o.jpg" alt="" />
+			<div class="details">
+				<p><strong>image one</strong> Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.</p>
+				<a class="more-info" href="http://github.com/elidupuis/qCycle/">Find out more ></a>
+			</div>
+		</div>
+	</div>
+	<div id="pagers"></div>
+	
+	<p>Get more info, including the source, at <a href="http://github.com/elidupuis/qCycle/">http://github.com/elidupuis/qCycle/</a>.</p>
+	
+	<div id="slideshow2" class="slideshow">
+		<div class="slide">
+			<img src="http://farm2.static.flickr.com/1237/4597107891_069ea63d91_o.jpg" alt="" />
+			<div class="details">
+				<p><strong>image one</strong> Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.</p>
+				<a class="more-info" href="http://github.com/elidupuis/qCycle/">Find out more ></a>
+			</div>
+		</div>
+	</div>
+	
+	
+</body>
+</html>

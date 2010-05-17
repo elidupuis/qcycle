@@ -38,77 +38,118 @@ $.fn.qCycle = function(options) {
 		var $this = $(this);
 		var qcycle = {
 			slidesLoaded: 0,
-			opts: opts,
 			toLoad: opts.toLoad,
+			malsupOpts: null,
 			
 			initSlideshow: function() {
+				if(window.console) window.console.log($this, opts);
  				try {
+					//	define image onLoad action:
 					var theImage = $('<img/>').load(function(){ 
 						qcycle.addSlide($(this));
 					});
 
-					//	check for JSON
-					if (typeof(opts.toLoad) === 'string') {
+					//	check for JSON. here we assume that a simple string is a URL that will return JSON:
+					if (opts.toLoad.constructor.name === 'String') {
+
+						//	get json from url:
 						$.getJSON(opts.toLoad, function(json){
+
+							//	store result on qcycle object
 							qcycle.toLoad = json;
-							qcycle.setImageSource(theImage);
+							
+							//	check if json returned an array - for low level debuggin help:
+							if (json.constructor.name === 'Array') {
+								
+								//	set image source to initialize loading:
+								qcycle.setImageSource(theImage);
+								
+							}else{
+								if(window.console) window.console.error($.fn.qCycle.ver(), ': JSON must return an Array. Currently returning', json.constructor.name);
+							};
+							
 						});
+
+					//	otherwise assume we have an array of data to deal with:
 					}else{
+						//	set image source to initialize loading:
 						qcycle.setImageSource(theImage);
 					};
+					
 				} catch(error) {
-					if(window.console) window.console.error('$.qcycle toLoad option is null.');
+					//	this could be a different error, but toLoad option is most likely.
+					if(window.console) window.console.error($.fn.qCycle.ver(), ': toLoad option is not set.');
 				}
 
-				this.slidesLoaded++;
+				//	increment number of slides loaded:
+				qcycle.slidesLoaded++;
 			},
 			
 			initCycle: function () {
-				//	start cycle
+				//	start cycle:
 				$this.cycle(opts.cycleOpts);
-				if (this.slidesLoaded < qcycle.toLoad.length) qcycle.loadSlide();
-				this.slidesLoaded++;
+
+				//	retrieve jquery.cycle options now that cycle has been initialized:
+				this.malsupOpts = $this.data('cycle.opts');
+				
+				//	if there's more slides to load, do it:
+				if (qcycle.slidesLoaded < qcycle.toLoad.length) qcycle.loadSlide();
+				
+				//	increment number of slides loaded:
+				qcycle.slidesLoaded++;
 			},
 			
 			addSlide: function (img) {
-				var cycleOpts = $this.data('cycle.opts');
 				
-				var slide = qcycle.opts.createSlide.call(this,img);
+				//	call the createSlide function (as defined in user options):
+				var slide = opts.createSlide.call(this, img);
 
 				//	add newly loaded slide:
-				if (!cycleOpts) {
+				if (!this.malsupOpts) {
 					//	first pass. use standard jquery.append because cycle is not initialized yet.
 					$this.append(slide);
+					
+					//	initialize malsup's jquery.cycle
 					qcycle.initCycle();
+
 				}else{
 					//	not first pass. add slide via cycle.addSlide() function:
-					cycleOpts.addSlide(slide);
+					this.malsupOpts.addSlide(slide);
+
 				};
 
-				//	update counters and initiate loading of next image (if there's more tho load!):
-				var loaded = this.slidesLoaded;
-				if (loaded < qcycle.toLoad.length ) qcycle.loadSlide();
-				this.slidesLoaded++;
+				//	update counters and initiate loading of next image (if there's more to load):
+				if (qcycle.slidesLoaded < qcycle.toLoad.length ) qcycle.loadSlide();
+				qcycle.slidesLoaded++;
 
-			},
-			
-			setImageSource: function(img){
-				img.data('qCycle.slideData',qcycle.toLoad[qcycle.slidesLoaded]);
-
-				if (qcycle.toLoad[qcycle.slidesLoaded][opts.imageKey]) {
-					img.attr( 'src', qcycle.toLoad[qcycle.slidesLoaded][opts.imageKey] );
-				}else{
-					img.attr( 'src', qcycle.toLoad[qcycle.slidesLoaded] );
-				};
 			},
 
 			loadSlide: function () {
+				
+				//	create image node, attach load functionality:
 				var theImage = $('<img/>').load(function(){ 
 						qcycle.addSlide($(this));
 				});
-				// .data( 'qCycle.slideData', qcycle.toLoad[qcycle.slidesLoaded]	);	
+				
+				//	set image source to initiaize image preloading:
 				qcycle.setImageSource(theImage);
+			},
+			
+			setImageSource: function(img){
+				//	store user's custom data on the image that is loaded so it can be accessed from createSlide function:
+				img.data('qCycle.slideData', qcycle.toLoad[qcycle.slidesLoaded]);
+
+				if (qcycle.toLoad[qcycle.slidesLoaded][opts.imageKey]) {
+					//	if opts.imageKey exists, we have custom data structure:
+					img.attr( 'src', qcycle.toLoad[qcycle.slidesLoaded][opts.imageKey] );
+					
+				}else{
+					//	if opts.imageKey does not exist, we are dealing with images only, not custom data structure
+					img.attr( 'src', qcycle.toLoad[qcycle.slidesLoaded] );
+					
+				};
 			}
+			
 		};
 
 		//	start the action here
