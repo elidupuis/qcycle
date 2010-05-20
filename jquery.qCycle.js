@@ -38,11 +38,10 @@ $.fn.qCycle = function(options) {
 		var $this = $(this);
 		var qcycle = {
 			slidesLoaded: 0,
-			toLoad: opts.toLoad,
+			toLoad: opts.toLoad,	//	bascially because we allow json, original opts.toLoad will always contain the initial data (array or url string), while qcycle.toLoad will contain the actual data array
 			malsupOpts: null,
 			
 			initSlideshow: function() {
-				if(window.console) window.console.log($this, opts);
  				try {
 					//	define image onLoad action:
 					var theImage = $('<img/>').load(function(){ 
@@ -94,15 +93,13 @@ $.fn.qCycle = function(options) {
 				
 				//	if there's more slides to load, do it:
 				if (qcycle.slidesLoaded < qcycle.toLoad.length) qcycle.loadSlide();
-				
-				//	increment number of slides loaded:
-				qcycle.slidesLoaded++;
+
 			},
 			
 			addSlide: function (img) {
 				
 				//	call the createSlide function (as defined in user options):
-				var slide = opts.createSlide.call(this, img);
+				var slide = opts.createSlide.call(this, img, qcycle.slidesLoaded);
 
 				//	add newly loaded slide:
 				if (!this.malsupOpts) {
@@ -119,8 +116,8 @@ $.fn.qCycle = function(options) {
 				};
 
 				//	update counters and initiate loading of next image (if there's more to load):
-				if (qcycle.slidesLoaded < qcycle.toLoad.length ) qcycle.loadSlide();
 				qcycle.slidesLoaded++;
+				if (qcycle.slidesLoaded < qcycle.toLoad.length ) qcycle.loadSlide();
 
 			},
 
@@ -131,7 +128,7 @@ $.fn.qCycle = function(options) {
 						qcycle.addSlide($(this));
 				});
 				
-				//	set image source to initiaize image preloading:
+				//	set image source to initiate image preloading:
 				qcycle.setImageSource(theImage);
 			},
 			

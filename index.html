@@ -50,25 +50,32 @@
 
 		
 		$(document).ready(function(){
-			$('#slideshow').qCycle({
-				toLoad: images,
-				cycleOpts: 	{
-								fx: 'fade',
-								timeout: 3*1000,
-								pager: '#pagers'
-				},
-				createSlide: function (img) {
-					var data = img.data('qCycle.slideData');
-					var slide = $('<div>').addClass('slide').append($(img).attr('alt',data.title));
-					slide.append(
-						$('<div class="details">').append($('<p></p>').html( "<strong>" + data.title + "</strong> " + data.blurb )).append(
-								$('<a class="more-info"></a>').text('Find out more >').attr('href',data.href)
-						));
-					return slide;
-				},
-				imageKey: 'imag'
+			
+			$('#trigger').click(function(){
+				$('#slideshow').qCycle({
+					toLoad: images,
+					cycleOpts: 	{
+									fx: 'fade',
+									timeout: 3*1000,
+									pager: '#pagers'
+					},
+					createSlide: function (img, index) {
+						if(window.console) window.console.log(img, index);
+						var data = img.data('qCycle.slideData');
+						var slide = $('<div>').addClass('slide').append($(img).attr('alt',data.title));
+						slide.append(
+							$('<div class="details">').append($('<p></p>').html( "<strong>" + data.title + "</strong> " + data.blurb )).append(
+									$('<a class="more-info"></a>').text('Find out more >').attr('href',data.href)
+							));
+						return slide;
+					},
+					imageKey: 'imag',
+					onPageLoad: false
+				});
+				
+				$(this).parent().text("Good job! You're smart.");
 			});
-
+			
 		});
 		
 		// if(window.console) window.console.info($.fn.qCycle.ver());
@@ -88,6 +95,8 @@
 		</div>
 	</div>
 	<div id="pagers"></div>
+	
+	<p>The first image is loaded in the HTML source. <a id="trigger" href="#">Click here</a> to start loading the rest of the slides!</p>
 	
 	<p>Get more info, including the source, at <a href="http://github.com/elidupuis/qCycle/">http://github.com/elidupuis/qCycle/</a>.</p>
 	
