@@ -1,7 +1,7 @@
 /**
- *	jQuery qCycle plugin
- *	@version 0.7
- *	@date April 16, 2010
+ *	jQuery qcycle plugin
+ *	@version 0.8
+ *	@date May 20, 2010
  *	@author Eli Dupuis
  *	@license Creative Commons Share Alike 2.5 Canada (http://creativecommons.org/licenses/by-sa/2.5/ca/)
  *	Requires: jQuery v1.3.2 or later (most likely works fine with earlier versions, but untested)
@@ -16,23 +16,26 @@
 	-added imageKey option. user can now customize the image path property in toLoad array.
 	-added ability to pass in a url for the toLoad option. URL should return a JSON array. this still needs some clean up...
  *	v0.5
-	-updated all internal functions to be within the $.fn.qCycle namespace
+	-updated all internal functions to be within the $.fn.qcycle namespace
  *	v0.4
 	-added ability to pass in an array of images only, as opposed to an array of objects containing image paths as well as other data. 
 	-updated start property to be a boolean called onPageLoad. by default the plugin waits for $(window).load. set to false to run immediately
  *	v0.3
-	-added 'start' option. can be either 'pageload' or 'immediate'. immediate is equivalent to domReady since you should not be calling qCycle before the DOM is ready. pageload waits for the rest of the page to load (fired on window.load)
+	-added 'start' option. can be either 'pageload' or 'immediate'. immediate is equivalent to domReady since you should not be calling qcycle before the DOM is ready. pageload waits for the rest of the page to load (fired on window.load)
  *
+ *	TODO: add callback for when all slides have been loaded
+ *	TODO: see if all slides can be loaded dynamically?
+ *	TODO: update name from qcycle to qcycle
 */
 
 (function($) {
 
-var ver = '0.7';
+var ver = '0.8';
 
-$.fn.qCycle = function(options) {
+$.fn.qcycle = function(options) {
 
 	// build main options before element iteration:
-	var opts = $.extend({}, $.fn.qCycle.defaults, options);
+	var opts = $.extend({}, $.fn.qcycle.defaults, options);
 
 	return this.each(function() {
 		var $this = $(this);
@@ -40,8 +43,8 @@ $.fn.qCycle = function(options) {
 			slidesLoaded: 0,
 			toLoad: opts.toLoad,	//	bascially because we allow json, original opts.toLoad will always contain the initial data (array or url string), while qcycle.toLoad will contain the actual data array
 			malsupOpts: null,
-			
-			initSlideshow: function() {
+
+			initPlugin: function() {
  				try {
 					//	define image onLoad action:
 					var theImage = $('<img/>').load(function(){ 
@@ -64,7 +67,7 @@ $.fn.qCycle = function(options) {
 								qcycle.setImageSource(theImage);
 								
 							}else{
-								if(window.console) window.console.error($.fn.qCycle.ver(), ': JSON must return an Array. Currently returning', json.constructor.name);
+								if(window.console) window.console.error($.fn.qcycle.ver(), ': JSON must return an Array. Currently returning', json.constructor.name);
 							};
 							
 						});
@@ -77,11 +80,9 @@ $.fn.qCycle = function(options) {
 					
 				} catch(error) {
 					//	this could be a different error, but toLoad option is most likely.
-					if(window.console) window.console.error($.fn.qCycle.ver(), ': toLoad option is not set.');
+					if(window.console) window.console.error($.fn.qcycle.ver(), ': toLoad option is not set.');
 				}
 
-				//	increment number of slides loaded:
-				qcycle.slidesLoaded++;
 			},
 			
 			initCycle: function () {
@@ -90,13 +91,14 @@ $.fn.qCycle = function(options) {
 
 				//	retrieve jquery.cycle options now that cycle has been initialized:
 				this.malsupOpts = $this.data('cycle.opts');
-				
-				//	if there's more slides to load, do it:
-				if (qcycle.slidesLoaded < qcycle.toLoad.length) qcycle.loadSlide();
 
 			},
 			
 			addSlide: function (img) {
+				// if(window.console) window.console.log('addSlide(), qcycle.slidesLoaded:', qcycle.slidesLoaded);
+
+				//	increment count for slides loaded
+				qcycle.slidesLoaded++;
 				
 				//	call the createSlide function (as defined in user options):
 				var slide = opts.createSlide.call(this, img, qcycle.slidesLoaded);
@@ -115,13 +117,21 @@ $.fn.qCycle = function(options) {
 
 				};
 
-				//	update counters and initiate loading of next image (if there's more to load):
-				qcycle.slidesLoaded++;
-				if (qcycle.slidesLoaded < qcycle.toLoad.length ) qcycle.loadSlide();
-
+				//	initiate loading of next image (if there's more to load):
+				if (qcycle.slidesLoaded < qcycle.toLoad.length ) {
+					//	load next image:
+					qcycle.loadSlide();
+					
+				}else{
+					//	fire onComplete callback
+					opts.onComplete.call(this, qcycle.slidesLoaded);
+					
+				}
+				
 			},
 
 			loadSlide: function () {
+				// if(window.console) window.console.log('loadSlide(), qcycle.slidesLoaded:', qcycle.slidesLoaded);
 				
 				//	create image node, attach load functionality:
 				var theImage = $('<img/>').load(function(){ 
@@ -133,8 +143,11 @@ $.fn.qCycle = function(options) {
 			},
 			
 			setImageSource: function(img){
+				
+				// if(window.console) window.console.log('setImageSource(), qcycle.slidesLoaded:', qcycle.slidesLoaded);
+				
 				//	store user's custom data on the image that is loaded so it can be accessed from createSlide function:
-				img.data('qCycle.slideData', qcycle.toLoad[qcycle.slidesLoaded]);
+				img.data('qcycle.slideData', qcycle.toLoad[qcycle.slidesLoaded]);
 
 				if (qcycle.toLoad[qcycle.slidesLoaded][opts.imageKey]) {
 					//	if opts.imageKey exists, we have custom data structure:
@@ -152,25 +165,26 @@ $.fn.qCycle = function(options) {
 		//	start the action here
 		if (opts.onPageLoad) {
 			$(window).load(function(){
-				qcycle.initSlideshow();
+				qcycle.initPlugin();
 			});
 		}else{
-			qcycle.initSlideshow();
+			qcycle.initPlugin();
 		};
 
 	});
 };
 
 // plugin defaults
-$.fn.qCycle.defaults = {
+$.fn.qcycle.defaults = {
 	toLoad: null,
 	cycleOpts: {},
 	createSlide: function(img){	return img;	},
+	onComplete: function(){},
 	onPageLoad: true,
 	imageKey: 'img'
 };
 
 //	public function/method
-$.fn.qCycle.ver = function() { return "jquery.qCycle version " + ver; };
+$.fn.qcycle.ver = function() { return "jquery.qcycle version " + ver; };
 
 })(jQuery);

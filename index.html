@@ -5,7 +5,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-	<title>jQuery qCycle</title>
+	<title>jQuery qcycle</title>
 	<style type="text/css" media="screen">
 		/* None of this CSS is required to use the plugin. It is simply for the demo. */
 		#slideshow a			{ color: #fff; text-decoration: none; }
@@ -19,7 +19,7 @@
 	</style>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.latest.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="jquery.qCycle.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery.qcycle.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
 		var images = [
 						{
@@ -52,7 +52,7 @@
 		$(document).ready(function(){
 			
 			$('#trigger').click(function(){
-				$('#slideshow').qCycle({
+				$('#slideshow').qcycle({
 					toLoad: images,
 					cycleOpts: 	{
 									fx: 'fade',
@@ -60,8 +60,8 @@
 									pager: '#pagers'
 					},
 					createSlide: function (img, index) {
-						if(window.console) window.console.log(img, index);
-						var data = img.data('qCycle.slideData');
+						if(window.console) window.console.log("createSlide()", img, index);
+						var data = img.data('qcycle.slideData');
 						var slide = $('<div>').addClass('slide').append($(img).attr('alt',data.title));
 						slide.append(
 							$('<div class="details">').append($('<p></p>').html( "<strong>" + data.title + "</strong> " + data.blurb )).append(
@@ -70,7 +70,10 @@
 						return slide;
 					},
 					imageKey: 'imag',
-					onPageLoad: false
+					onPageLoad: false,
+					onComplete: function(count){
+						if(window.console) window.console.log('onComplete()', count, 'items loaded');
+					}
 				});
 				
 				$(this).parent().text("Good job! You're smart.");
@@ -78,19 +81,19 @@
 			
 		});
 		
-		// if(window.console) window.console.info($.fn.qCycle.ver());
+		// if(window.console) window.console.info($.fn.qcycle.ver());
 	</script>
 </head>
 
 <body>
-	<h1>jQuery.qCycle Demo</h1>
+	<h1>jQuery.qcycle Demo</h1>
 
 	<div id="slideshow">
 		<div class="slide">
 			<img src="http://farm2.static.flickr.com/1243/4597723386_5115429a6e_o.jpg" alt="" />
 			<div class="details">
 				<p><strong>image one</strong> Conveniently maximize user friendly experiences with future-proof partnerships. Energistically harness market positioning alignments via client-focused relationships.</p>
-				<a class="more-info" href="http://github.com/elidupuis/qCycle/">Find out more ></a>
+				<a class="more-info" href="http://github.com/elidupuis/qcycle/">Find out more ></a>
 			</div>
 		</div>
 	</div>
@@ -98,7 +101,7 @@
 	
 	<p>The first image is loaded in the HTML source. <a id="trigger" href="#">Click here</a> to start loading the rest of the slides!</p>
 	
-	<p>Get more info, including the source, at <a href="http://github.com/elidupuis/qCycle/">http://github.com/elidupuis/qCycle/</a>.</p>
+	<p>Get more info, including the source, at <a href="http://github.com/elidupuis/qcycle/">http://github.com/elidupuis/qcycle/</a>.</p>
 	
 </body>
 </html>
