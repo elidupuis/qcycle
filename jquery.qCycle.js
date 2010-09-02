@@ -7,28 +7,6 @@
  *	Requires: jQuery v1.3.2 or later (most likely works fine with earlier versions, but untested)
  *	Requires: jquery Cycle plugin by Mike Alsup (http://www.malsup.com/jquery/cycle/)
  *				uses jquery.cycle.addSlide() function which is not supported in jquery.cycleLite (http://www.malsup.com/jquery/cycle/lite/)
- *
- *	CHANGLOG:
- *	v0.8
-	-add onComplete callback
-	-update spelling to all lowercase (qcycle) 
-	-rename some internal functions
-	-rename toLoad option to slideData
-	-rename onPageLoad option to defer, and change default to false
- *	v0.7
-	-complete restructuring of code.
- *	v0.6
-	-reverted namespacing of internal functions
-	-added imageKey option. user can now customize the image path property in slideData array.
-	-added ability to pass in a url for the slideData option. URL should return a JSON array. this still needs some clean up...
- *	v0.5
-	-updated all internal functions to be within the $.fn.qcycle namespace
- *	v0.4
-	-added ability to pass in an array of images only, as opposed to an array of objects containing image paths as well as other data. 
-	-updated start property to be a boolean called defer. by default the plugin waits for $(window).load. set to false to run immediately
- *	v0.3
-	-added 'start' option. can be either 'pageload' or 'immediate'. immediate is equivalent to domReady since you should not be calling qcycle before the DOM is ready. pageload waits for the rest of the page to load (fired on window.load)
- *
 */
 
 (function($) {

@@ -53,7 +53,7 @@
 			
 			$('#trigger').click(function(){
 				$('#slideshow').qcycle({
-					toLoad: images,
+					slideData: images,
 					cycleOpts: 	{
 									fx: 'fade',
 									timeout: 3*1000,
@@ -70,7 +70,7 @@
 						return slide;
 					},
 					imageKey: 'imag',
-					onPageLoad: false,
+					defer: false,
 					onComplete: function(count){
 						if(window.console) window.console.log('onComplete()', count, 'items loaded');
 					}
